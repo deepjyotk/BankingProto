@@ -1,14 +1,19 @@
 package org.bankingproto.service;
 
+import com.google.common.util.concurrent.Uninterruptibles;
 import com.google.protobuf.Empty;
 import io.grpc.stub.StreamObserver;
-import org.bankingproto.generated.AccountBalance;
-import org.bankingproto.generated.AllAccountsResponse;
-import org.bankingproto.generated.BalanceCheckRequest;
-import org.bankingproto.generated.BankServiceGrpc;
+import org.bankingproto.common.GrpcServer;
+import org.bankingproto.generated.*;
 import org.bankingproto.repository.AccountRepository;
+import org.bankingproto.requesthandlers.DepositRequestHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.TimeUnit;
 
 public class BankService extends BankServiceGrpc.BankServiceImplBase{
+    private static final Logger log = LoggerFactory.getLogger(BankService.class);
 
     // to support streaming response,we can support emitting values and go with streaming response.
     //grpc is generic, though here we want to send unary response from the server, grpc follows observer style.
