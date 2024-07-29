@@ -43,4 +43,43 @@ public class BankService extends BankServiceGrpc.BankServiceImplBase{
 
         responseObserver.onCompleted();
     }
+
+    @Override
+    public void withdraw(WithdrawRequest request, StreamObserver<Money> responseObserver) {
+        /*
+        we should validate the input request,
+           assumption: account# :1-10,and withdraw amount is multiple of 10$
+        */
+
+        var accountNumber = request.getAccountNumber();
+        var requestedAmount = request.getAmount() ;
+
+        var accountBalance = AccountRepository.getBalance(accountNumber) ;
+
+        if(requestedAmount > accountBalance){
+            responseObserver.onCompleted();
+            return ;
+        }
+
+        else{
+            for(int i=0;i<(requestedAmount/10) ; i++){
+                var money = Money.newBuilder().setAmount(10).build() ;
+                responseObserver.onNext(money);
+
+                log.info("money sent is : {} ", money ) ;
+
+                AccountRepository.deductAmount(accountNumber,10 );
+
+                Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
+            }
+
+            responseObserver.onCompleted();
+        }
+
+    }
+
+    @Override
+    public StreamObserver<DepositRequest> deposit(StreamObserver<AccountBalance> responseObserver) {
+        return new DepositRequestHandler(responseObserver) ;
+    }
 }
