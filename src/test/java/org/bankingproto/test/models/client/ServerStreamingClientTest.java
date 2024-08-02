@@ -39,7 +39,7 @@ public class ServerStreamingClientTest extends AbstractTest {
     public void asyncStub(){
         var request = WithdrawRequest.newBuilder().setAccountNumber(1).setAmount(20).build() ;
         var observer = ResponseObserver.<Money>create();
-        this.stub.withdraw(request, observer);
+        this.bankServiceStub.withdraw(request, observer);
         observer.await();
         Assertions.assertEquals(2, observer.getItems().size());
         Assertions.assertEquals(10, observer.getItems().getFirst().getAmount());
